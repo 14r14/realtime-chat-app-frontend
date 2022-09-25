@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+import Login from "./views/Auth/LoginPage";
 import Register from "./views/Auth/RegisterPage";
 
 function App() {
@@ -6,6 +7,7 @@ function App() {
     <>
       <Routes>
         <Route path="/auth/register" element={<Register />} />
+        <Route path="/auth/login" element={<Login />} />
       </Routes>
     </>
   );

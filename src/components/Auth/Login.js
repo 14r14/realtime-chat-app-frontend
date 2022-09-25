@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "../../axiosInstance";
 import AuthContext from "../../store/AuthContext";
 
-function Register() {
+function Login() {
   const {
     register,
     handleSubmit,
@@ -13,28 +13,20 @@ function Register() {
     setError,
   } = useForm();
 
-  const navigate = useNavigate();
   const authCtx = useContext(AuthContext);
 
+  const navigate = useNavigate();
+
   const submitHandler = () => {
-    const username = getValues("username");
     const email = getValues("email");
     const password = getValues("password");
-    const confirmPassword = getValues("confirmPass");
 
-    if (password !== confirmPassword) {
-      return setError("confirmPass", {
-        type: "nomatch",
-      });
-    }
     axios
       .post(
-        "/auth/register",
+        "/auth/login",
         {
-          username,
           email,
           password,
-          confirmPassword,
         },
         {
           withCredentials: true,
@@ -53,23 +45,7 @@ function Register() {
         }
         if (res.data.code === "validationerror") {
           const error = res.data.msg;
-          if (error.param === "username") {
-            if (error.msg === "required") {
-              setError("username", {
-                type: "required",
-              });
-            }
-            if (error.msg === "minlength") {
-              setError("username", {
-                type: "minLength",
-              });
-            }
-            if (error.msg === "maxlength") {
-              setError("username", {
-                type: "maxLength",
-              });
-            }
-          } else if (error.param === "email") {
+          if (error.param === "email") {
             if (error.msg === "required") {
               setError("email", {
                 type: "required",
@@ -91,45 +67,23 @@ function Register() {
                 type: "pattern",
               });
             }
-          } else if (error.param === "confirmPassword") {
-            if (error.msg === "required") {
-              setError("confirmPass", {
-                type: "required",
-              });
-            }
-            if (error.msg === "nomatch") {
-              setError("confirmPass", {
-                type: "nomatch",
-              });
-            }
           }
-        } else if (res.data.code === "useralrexists") {
+        } else if (res.data.code === "invdata") {
           setError("email", {
-            type: "useralrexists",
+            type: "invdata",
+          });
+          setError("password", {
+            type: "invdata",
+          });
+        } else if (res.data.code === "usernotfound") {
+          setError("email", {
+            type: "usernotfound",
           });
         }
       });
   };
   return (
     <form onSubmit={handleSubmit(submitHandler)}>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          {...register("username", {
-            required: true,
-            minLength: 3,
-            maxLength: 20,
-          })}
-        />
-        {errors.username?.type === "required" && <p>Username is required.</p>}
-        {errors.username?.type === "minLength" && (
-          <p>Username must be atleast 3 characters long.</p>
-        )}
-        {errors.username?.type === "maxLength" && (
-          <p>Username cannot be more than 20 character long.</p>
-        )}
-      </div>
       <div>
         <label htmlFor="email">Email</label>
         <input
@@ -139,9 +93,10 @@ function Register() {
             pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
           })}
         />
-        {errors.email?.type === "required" && <p>Email is required</p>}
-        {errors.email?.type === "pattern" && <p>Invalid email</p>}
-        {errors.email?.type === "useralrexists" && <p>Email already exists</p>}
+        {errors.email?.type === "required" && <p>Email is required.</p>}
+        {errors.email?.type === "pattern" && <p>Invalid email.</p>}
+        {errors.email?.type === "usernotfound" && <p>Email doesn't exist.</p>}
+        {errors.email?.type === "invdata" && <p>Invalid email or password.</p>}
       </div>
       <div>
         <label htmlFor="password">Password</label>
@@ -161,25 +116,13 @@ function Register() {
             character.
           </p>
         )}
-      </div>
-      <div>
-        <label htmlFor="confirmPassword">Confirm Password</label>
-        <input
-          id="confirmPassword"
-          {...register("confirmPass", {
-            required: true,
-            pattern:
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-          })}
-        />
-        {errors.confirmPass?.type === "required" && (
-          <p>Please confirm your password.</p>
+        {errors.password?.type === "invdata" && (
+          <p>Invalid email or password.</p>
         )}
-        {errors.confirmPass?.type === "nomatch" && <p>Passwords must match.</p>}
       </div>
       <button type="submit">Register</button>
     </form>
   );
 }
 
-export default Register;
+export default Login;

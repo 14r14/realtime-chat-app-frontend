@@ -7,7 +7,7 @@ const AuthContext = React.createContext({
   isLoggedIn: false,
   login: (token) => {},
   logout: () => {},
-  accountType: "",
+  active: false,
   username: "",
 });
 
@@ -101,11 +101,11 @@ export const AuthContextProvider = (props) => {
     }
   }, []);
 
-  const loginHandler = (token, expirationTime, accountType, username) => {
+  const loginHandler = (token, expirationTime, active, username) => {
     setToken(token);
     setLoggedIn(true);
     localStorage.setItem("expirationTime", expirationTime);
-    localStorage.setItem("accountType", accountType);
+    localStorage.setItem("active", active);
     setUsername(username);
     localStorage.setItem("username", username);
     localStorage.setItem("loggedIn", true);

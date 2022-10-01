@@ -44,7 +44,7 @@ function Register() {
         if (res.data.success) {
           const expirationTime = new Date(new Date().getTime() + 3600 * 1000);
           authCtx.login(
-            null,
+            res.data.token,
             expirationTime,
             res.data.active,
             res.data.username
